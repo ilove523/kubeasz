@@ -4,12 +4,9 @@
 
 ![ha-2x](../../pics/ha-2x.gif)
 
--
-注意1：请确保各节点时区设置一致、时间同步。 如果你的环境没有提供NTP 时间同步，推荐集成安装[chrony](../guide/chrony.md)
--
-注意2：在公有云上创建多主集群，请结合阅读[在公有云上部署 kubeasz](kubeasz_on_public_cloud.md)
--
-注意3：建议操作系统升级到新的稳定内核，请结合阅读[内核升级文档](../guide/kernel_upgrade.md)
+- 注意1：请确保各节点时区设置一致、时间同步。 如果你的环境没有提供NTP 时间同步，推荐集成安装[chrony](../guide/chrony.md)
+- 注意2：在公有云上创建多主集群，请结合阅读[在公有云上部署 kubeasz](kubeasz_on_public_cloud.md)
+- 注意3：建议操作系统升级到新的稳定内核，请结合阅读[内核升级文档](../guide/kernel_upgrade.md)
 
 ## 高可用集群所需节点配置如下
 |角色|数量|描述|
@@ -21,10 +18,8 @@
 
 在 kubeasz 2x 版本，多节点高可用集群安装可以使用2种方式
 
--
-1.先部署单节点集群 [AllinOne部署](quickStart.md)，然后通过 [节点添加](../op/op-index.md) 扩容成高可用集群
--
-2.按照如下步骤先规划准备，直接安装多节点高可用集群
+- 1.先部署单节点集群 [AllinOne部署](quickStart.md)，然后通过 [节点添加](../op/op-index.md) 扩容成高可用集群
+- 2.按照如下步骤先规划准备，直接安装多节点高可用集群
 
 ## 部署步骤
 
@@ -63,11 +58,10 @@ yum install python -y
 
 ### 3.在ansible控制端安装及准备ansible
 
-- 3.1 pip 安装 ansible（如果 Ubuntu
-pip报错，请看[附录](00-planning_and_overall_intro.md#Appendix)）
+- 3.1 pip 安装 ansible（如果 Ubuntu pip报错，请看[附录](00-planning_and_overall_intro.md#Appendix)）
 
 ```{.python .input}
-# Ubuntu 16.04 
+# Ubuntu 16.04
 apt-get install git python-pip -y
 # CentOS 7
 yum install git python-pip -y
@@ -123,11 +117,9 @@ ansible-playbook 01.prepare.yml
 ansible-playbook 02.etcd.yml
 ansible-playbook 03.docker.yml
 ansible-playbook 04.kube-master.yml
-ansible-
-playbook 05.kube-node.yml
+ansible-playbook 05.kube-node.yml
 ansible-playbook 06.network.yml # TODO:有错误
-ansible-
-playbook 07.cluster-addon.yml
+ansible-playbook 07.cluster-addon.yml
 # 一步安装
 #ansible-playbook 90.setup.yml
 ```
@@ -220,8 +212,7 @@ Active: activating (auto-restart) (Result: exit-code) since Fri 2019-07-12
 19:18:44 CST; 1s ago", "stdout_lines": ["   Active: activating (auto-restart)
 (Result: exit-code) since Fri 2019-07-12 19:18:44 CST; 1s ago"]}
 
-TASK [kube-
-node : 轮询等待node达到Ready状态]
+TASK [kube-node : 轮询等待node达到Ready状态]
 ******************************************************************************************************
 changed: [192.168.20.203]
 
@@ -239,13 +230,11 @@ PLAY RECAP
 
 运行`journalctl -xefu kubelet` 命令查看systemd日志才发现，真正的错误是：
 
-连不上
-unix://var/run/docker服务
+连不上unix://var/run/docker服务
 
 根本原因是 docker服务没有启动，启动 docker服务后，恢复正常。
 ```bash
-ssh
-<remote_ip> "systemctl enable docker;systemctl start docker"
+ssh <remote_ip> "systemctl enable docker;systemctl start docker"
 ```
 
 + [可选]对集群所有节点进行操作系统层面的安全加固 `ansible-playbook roles/os-harden/os-

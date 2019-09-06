@@ -9,18 +9,20 @@
 architecture)、支持`Network Policy`、备份恢复、[离线安装](docs/setup/offline_install.md)
 -
 **集群版本** kubernetes v1.11, v1.12, v1.13, v1.14, v1.15
-- **操作系统** Ubuntu 16.04+,
-CentOS/RedHat 7
-- **运行时** docker 18.06.x-ce, 18.09.x,
-[containerd](docs/guide/containerd.md) 1.2.6
+- **操作系统**
+    - Ubuntu 16.04+,
+    - CentOS/RedHat 7
+- **运行时**
+    - docker 18.06.x-ce, 18.09.x
+    - [containerd](docs/guide/containerd.md) 1.2.6
 - **网络**
-[calico](docs/setup/network-plugin/calico.md), [cilium](docs/setup/network-
-plugin/cilium.md), [flannel](docs/setup/network-plugin/flannel.md), [kube-
-ovn](docs/setup/network-plugin/kube-ovn.md), [kube-router](docs/setup/network-
-plugin/kube-router.md)
+    - [calico](docs/setup/network-plugin/calico.md)
+    - [cilium](docs/setup/network-plugin/cilium.md)
+    - [flannel](docs/setup/network-plugin/flannel.md)
+    - [kube-ovn](docs/setup/network-plugin/kube-ovn.md)
+    - [kube-router](docs/setup/network-plugin/kube-router.md)
 
-请阅读[项目分支说明](docs/mixes/branch.md),
-欢迎提[Issues](https://github.com/easzlab/kubeasz/issues)和[PRs](docs/mixes/HowToContribute.md)参与维护项目！感谢您的关注与支持！
+请阅读[项目分支说明](docs/mixes/branch.md)，欢迎提[Issues](https://github.com/easzlab/kubeasz/issues)和[PRs](docs/mixes/HowToContribute.md)参与维护项目！感谢您的关注与支持！
 ## 快速指南
 
 单机快速体验k8s集群的测试、开发环境--[AllinOne部署](docs/setup/quickStart.md)
@@ -48,8 +50,7 @@ href="docs/setup/07-install_cluster_addon.md">07-安装集群插件</a></td>
 </table>
 
 - 命令行工具 [easzctl介绍](docs/setup/easzctl_cmd.md)
-- 公有云自建集群
-[部署指南](docs/setup/kubeasz_on_public_cloud.md)
+- 公有云自建集群 [部署指南](docs/setup/kubeasz_on_public_cloud.md)
 
 ## 使用指南
 
@@ -125,13 +126,11 @@ href=""></a></td>
 
 ## 沟通交流
 
-- 微信群：k8s&kubeasz实践,
-搜索微信号`badtobone`, 请备注（城市-github用户名）, 验证通过会加入群聊。
-- 推荐阅读：[feisky-
-Kubernetes指南](https://github.com/feiskyer/kubernetes-
-handbook/blob/master/SUMMARY.md) [rootsongjc-
-Kubernetes指南](https://github.com/rootsongjc/kubernetes-handbook) [opsnull-
-安装教程](https://github.com/opsnull/follow-me-install-kubernetes-cluster)
+- 微信群：k8s&kubeasz实践, 搜索微信号`badtobone`, 请备注（城市-github用户名）, 验证通过会加入群聊。
+- 推荐阅读：
+    - [feisky-Kubernetes指南](https://github.com/feiskyer/kubernetes-handbook/blob/master/SUMMARY.md)
+    -  [rootsongjc-Kubernetes指南](https://github.com/rootsongjc/kubernetes-handbook)
+    -  [opsnull-安装教程](https://github.com/opsnull/follow-me-install-kubernetes-cluster)
 
 ## 贡献&致谢
 - [如何 PR](docs/mixes/HowToContribute.md)
