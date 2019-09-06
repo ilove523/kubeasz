@@ -82,7 +82,6 @@ stop docker`
 
 ```bash
 $ umount /var/run/docker/netns/default
-$ umount
-/var/lib/docker/overlay
+$ umount /var/lib/docker/overlay
 $ rm -rf /var/lib/docker /var/run/docker
 ```

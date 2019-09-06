@@ -32,7 +32,7 @@ ssh-keygen -t rsa -b 2048 回车 回车 回车
 ssh-copy-id $IP  # $IP 为所有节点地址包括自身，按照提示输入 yes 和 root 密码
 ```
 
-### 安装集群
+### 4.安装集群
 
 - 4.1 容器化运行 kubeasz，详见[文档](docker_kubeasz.md)
 
