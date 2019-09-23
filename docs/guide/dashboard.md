@@ -128,7 +128,6 @@ users:
 
 ### 参考
 + 1.[Dashboard Accesscontrol](https://github.com/kubernetes/dashboard/wiki/Access-control)
-
 + 2.[a-read-only-kubernetes-dashboard](https://blog.cowger.us/2018/07/03/a-read-only-kubernetes-dashboard.html)
 
 ```bash
@@ -173,7 +172,7 @@ pod "kubernetes-dashboard-5c7687cf8-dbnpg" deleted
 # on 2019.09.10
 # 切换到部署主机
 ## 删除旧版dashboard
-[root@wfh_deploy ~]# kubectl apply -f /etc/ansible/manifests/dashboard/kubernetes-dashboard.yaml
+[root@wfh_deploy ~]# kubectl delete -f /etc/ansible/manifests/dashboard/kubernetes-dashboard.yaml
 secret "kubernetes-dashboard-certs" deleted
 serviceaccount "kubernetes-dashboard" deleted
 role.rbac.authorization.k8s.io "kubernetes-dashboard-minimal" deleted
