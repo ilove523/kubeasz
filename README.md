@@ -4,11 +4,9 @@
 同时也努力成为`k8s`实践、使用的参考书；基于二进制方式部署和利用`ansible-playbook`实现自动化；既提供一键安装脚本,
 也可以根据`安装指南`分步执行安装各个组件。
 
-- **集群特性**
-`TLS`双向认证、`RBAC`授权、[多Master高可用](docs/setup/00-planning_and_overall_intro.md#ha-architecture)、支持`Network Policy`、备份恢复、[离线安装](docs/setup/offline_install.md)
+- **集群特性** `TLS`双向认证、`RBAC`授权、[多Master高可用](docs/setup/00-planning_and_overall_intro.md#ha-architecture)、支持`Network Policy`、备份恢复、[离线安装](docs/setup/offline_install.md)
 
--
-**集群版本** kubernetes v1.11, v1.12, v1.13, v1.14, v1.15
+- **集群版本** kubernetes v1.11, v1.12, v1.13, v1.14, v1.15
 - **操作系统**
     - Ubuntu 16.04+
     - CentOS/RedHat 7
@@ -31,103 +29,69 @@
 ## 安装指南
 <table border="0">
     <tr>
-        <td><a
-href="docs/setup/00-planning_and_overall_intro.md">00-规划集群和配置介绍</a></td>
-<td><a
-href="docs/setup/02-install_etcd.md">02-安装etcd集群</a></td>
-        <td><a
-href="docs/setup/04-install_kube_master.md">04-安装master节点</a></td>
-<td><a
-href="docs/setup/06-install_network_plugin.md">06-安装集群网络</a></td>
-</tr>
+        <td><a href="docs/setup/00-planning_and_overall_intro.md">00-规划集群和配置介绍</a></td>
+        <td><a href="docs/setup/02-install_etcd.md">02-安装etcd集群</a></td>
+        <td><a href="docs/setup/04-install_kube_master.md">04-安装master节点</a></td>
+        <td><a href="docs/setup/06-install_network_plugin.md">06-安装集群网络</a></td>
+    </tr>
     <tr>
-<td><a
-href="docs/setup/01-CA_and_prerequisite.md">01-创建证书和安装准备</a></td>
-<td><a
-href="docs/setup/03-install_docker.md">03-安装docker服务</a></td>
-<td><a
-href="docs/setup/05-install_kube_node.md">05-安装node节点</a></td>
-<td><a
-href="docs/setup/07-install_cluster_addon.md">07-安装集群插件</a></td>
-</tr>
+        <td><a href="docs/setup/01-CA_and_prerequisite.md">01-创建证书和安装准备</a></td>
+        <td><a href="docs/setup/03-install_docker.md">03-安装docker服务</a></td>
+        <td><a href="docs/setup/05-install_kube_node.md">05-安装node节点</a></td>
+        <td><a href="docs/setup/07-install_cluster_addon.md">07-安装集群插件</a></td>
+    </tr>
 </table>
+
 - 命令行工具 [easzctl介绍](docs/setup/easzctl_cmd.md)
-- 公有云自建集群
-[部署指南](docs/setup/kubeasz_on_public_cloud.md)
+- 公有云自建集群[部署指南](docs/setup/kubeasz_on_public_cloud.md)
 
 ## 使用指南
 
 <table border="0">
-<tr>
-<td><strong>常用插件</strong><a
-href="docs/guide/index.md">+</a></td>
-<td><a
-href="docs/guide/kubedns.md">DNS</a></td>
-        <td><a
-href="docs/guide/dashboard.md">dashboard</a></td>
-        <td><a
-href="docs/guide/metrics-server.md">metrics-server</a></td>
-        <td><a
-href="docs/guide/prometheus.ipynb">prometheus</a></td>
-        <td><a
-href="docs/guide/efk.ipynb">efk</a></td>
-        <td><a
-href="docs/guide/ingress.md">ingress</a></td>
+    <tr>
+        <td><strong>常用插件</strong><a href="docs/guide/index.md">+</a></td>
+        <td><a href="docs/guide/kubedns.md">DNS</a></td>
+        <td><a href="docs/guide/dashboard.md">dashboard</a></td>
+        <td><a href="docs/guide/metrics-server.md">metrics-server</a></td>
+        <td><a href="docs/guide/prometheus.ipynb">prometheus</a></td>
+        <td><a href="docs/guide/efk.ipynb">efk</a></td>
+        <td><a href="docs/guide/ingress.md">ingress</a></td>
     </tr>
     <tr>
-<td><strong>集群管理</strong><a href="docs/op/op-index.md">+</a></td>
-        <td><a
-href="docs/op/op-node.ipynb">管理node节点</a></td>
-        <td><a href="docs/op/op-
-master.md">管理master节点</a></td>
-        <td><a href="docs/op/op-
-etcd.md">管理etcd节点</a></td>
-        <td><a
-href="docs/op/upgrade.md">升级集群</a></td>
-        <td><a
-href="docs/op/cluster_restore.md">备份恢复</a></td>
+        <td><strong>集群管理</strong><a href="docs/op/op-index.md">+</a></td>
+        <td><a href="docs/op/op-node.ipynb">管理node节点</a></td>
+        <td><a href="docs/op/op-master.md">管理master节点</a></td>
+        <td><a href="docs/op/op-etcd.md">管理etcd节点</a></td>
+        <td><a href="docs/op/upgrade.md">升级集群</a></td>
+        <td><a href="docs/op/cluster_restore.md">备份恢复</a></td>
         <td><a href=""></a></td>
-</tr>
+    </tr>
     <tr>
         <td><strong>特性实验</strong></td>
-        <td><a
-href="docs/guide/networkpolicy.md">NetworkPolicy</a></td>
-        <td><a
-href="docs/guide/rollingupdateWithZeroDowntime.md">RollingUpdate</a></td>
-<td><a
-href="docs/guide/hpa.md">HPA</a></td>
+        <td><a href="docs/guide/networkpolicy.md">NetworkPolicy</a></td>
+        <td><a href="docs/guide/rollingupdateWithZeroDowntime.md">RollingUpdate</a></td>
+        <td><a href="docs/guide/hpa.md">HPA</a></td>
         <td><a href=""></a></td>
-<td><a
-href=""></a></td>
+        <td><a href=""></a></td>
         <td><a href=""></a></td>
     </tr>
     <tr>
-<td><strong>周边生态</strong></td>
-        <td><a
-href="docs/guide/harbor.md">harbor</a></td>
-        <td><a
-href="docs/guide/helm.ipynb">helm</a></td>
-        <td><a
-href="docs/guide/jenkins.md">jenkins</a></td>
-        <td><a
-href="docs/guide/gitlab/readme.md">gitlab</a></td>
-        <td><a
-href=""></a></td>
+        <td><strong>周边生态</strong></td>
+        <td><a href="docs/guide/harbor.md">harbor</a></td>
+        <td><a href="docs/guide/helm.ipynb">helm</a></td>
+        <td><a href="docs/guide/jenkins.md">jenkins</a></td>
+        <td><a href="docs/guide/gitlab/readme.md">gitlab</a></td>
+        <td><a href=""></a></td>
         <td><a href=""></a></td>
     </tr>
     <tr>
-<td><strong>应用实践</strong></td>
-        <td><a
-href="docs/practice/java_war_app.md">java应用部署</a></td>
-        <td><a
-href="docs/practice/es_cluster.md">elasticsearch集群</a></td>
-        <td><a
-href="docs/practice/mariadb_cluster.md">mariadb集群</a></td>
-        <td><a
-href=""></a></td>
+        <td><strong>应用实践</strong></td>
+        <td><a href="docs/practice/java_war_app.md">java应用部署</a></td>
+        <td><a href="docs/practice/es_cluster.md">elasticsearch集群</a></td>
+        <td><a href="docs/practice/mariadb_cluster.md">mariadb集群</a></td>
         <td><a href=""></a></td>
-        <td><a
-href=""></a></td>
+        <td><a href=""></a></td>
+        <td><a href=""></a></td>
     </tr>
 </table>
 
