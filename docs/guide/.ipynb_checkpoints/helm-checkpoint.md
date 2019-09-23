@@ -64,14 +64,12 @@ ansible-playbook /etc/ansible/role/helm/helm.yml
 ## 安装检查
 
 输入指令：
-
-```{.python .input}
+```bash
 kubectl get pod -n kube-system -l app=helm
 ```
 
 输出结果：
-
-```{.python .input}
+```
 NAME                             READY   STATUS    RESTARTS   AGE
 tiller-
 deploy-78f97b6fdf-grmqk   1/1     Running   0          133m

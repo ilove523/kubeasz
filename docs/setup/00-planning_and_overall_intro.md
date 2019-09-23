@@ -4,9 +4,12 @@
 
 ![ha-2x](../../pics/ha-2x.gif)
 
-- 注意1：请确保各节点时区设置一致、时间同步。 如果你的环境没有提供NTP 时间同步，推荐集成安装[chrony](../guide/chrony.md)
-- 注意2：在公有云上创建多主集群，请结合阅读[在公有云上部署 kubeasz](kubeasz_on_public_cloud.md)
-- 注意3：建议操作系统升级到新的稳定内核，请结合阅读[内核升级文档](../guide/kernel_upgrade.md)
+-
+注意1：请确保各节点时区设置一致、时间同步。 如果你的环境没有提供NTP 时间同步，推荐集成安装[chrony](../guide/chrony.md)
+-
+注意2：在公有云上创建多主集群，请结合阅读[在公有云上部署 kubeasz](kubeasz_on_public_cloud.md)
+-
+注意3：建议操作系统升级到新的稳定内核，请结合阅读[内核升级文档](../guide/kernel_upgrade.md)
 
 ## 高可用集群所需节点配置如下
 |角色|数量|描述|
@@ -18,8 +21,10 @@
 
 在 kubeasz 2x 版本，多节点高可用集群安装可以使用2种方式
 
-- 1.先部署单节点集群 [AllinOne部署](quickStart.md)，然后通过 [节点添加](../op/op-index.md) 扩容成高可用集群
-- 2.按照如下步骤先规划准备，直接安装多节点高可用集群
+-
+1.先部署单节点集群 [AllinOne部署](quickStart.md)，然后通过 [节点添加](../op/op-index.md) 扩容成高可用集群
+-
+2.按照如下步骤先规划准备，直接安装多节点高可用集群
 
 ## 部署步骤
 
@@ -58,7 +63,8 @@ yum install python -y
 
 ### 3.在ansible控制端安装及准备ansible
 
-- 3.1 pip 安装 ansible（如果 Ubuntu pip报错，请看[附录](00-planning_and_overall_intro.md#Appendix)）
+- 3.1 pip 安装 ansible（如果 Ubuntu
+pip报错，请看[附录](00-planning_and_overall_intro.md#Appendix)）
 
 ```{.python .input}
 # Ubuntu 16.04
@@ -69,7 +75,7 @@ yum install git python-pip -y
 #pip install pip --upgrade
 #pip install ansible==2.6.12
 pip install pip --upgrade -i http://mirrors.aliyun.com/pypi/simple/ --trusted-host mirrors.aliyun.com
-pip install ansible==2.6.12 -i http://mirrors.aliyun.com/pypi/simple/ --trusted-host mirrors.aliyun.com
+pip install ansible==2.8.4 -i http://mirrors.aliyun.com/pypi/simple/ --trusted-host mirrors.aliyun.com
 ```
 
 - 3.2 在ansible控制端配置免密码登陆
@@ -111,7 +117,7 @@ hosts`, 然后实际情况修改此hosts文件
 - 4.4 开始安装
 如果你对集群安装流程不熟悉，请阅读项目首页 **安装步骤** 讲解后分步安装，并对 **每步都进行验证**
 
-```bash
+```{.python .input}
 # 分步安装
 ansible-playbook 01.prepare.yml
 ansible-playbook 02.etcd.yml
@@ -128,7 +134,7 @@ ansible-playbook 07.cluster-addon.yml
 
 执行指令`ansible-playbook 04.kube-master.yml`时，出现错误：
 
-```bash
+```{.python .input}
 ...
 TASK
 [kube-node : 轮询等待kubelet启动]
@@ -182,7 +188,7 @@ PLAY RECAP
 执行指令`[root@wfh_deploy ansible]# ansible-playbook 05.kube-
 node.yml`出现下面错误：
 
-```bash
+```{.python .input}
 TASK [kube-node : 开启kube-proxy 服务]
 ********************************************************************************************************
 changed: [192.168.20.202]
@@ -229,16 +235,90 @@ PLAY RECAP
 **问题原因及解决办法：**
 
 运行`journalctl -xefu kubelet` 命令查看systemd日志才发现，真正的错误是：
-
 连不上unix://var/run/docker服务
 
 根本原因是 docker服务没有启动，启动 docker服务后，恢复正常。
-```bash
+
+```{.python .input}
 ssh <remote_ip> "systemctl enable docker;systemctl start docker"
 ```
 
 + [可选]对集群所有节点进行操作系统层面的安全加固 `ansible-playbook roles/os-harden/os-
 harden.yml`，详情请参考[os-harden项目](https://github.com/dev-sec/ansible-os-hardening)
+
+2019.09.07
+
+问题：多个 etcd 服务出现启动失败的现象。`systemctl status -l etcd`
+
+Sep 07 10:45:41
+wfh_node06 etcd[16140]: request sent was ignored (cluster ID mismatch:
+peer[f212819f18bbd3b]=8e3d9d2b4b39c808, local=c24df220e3012a91)
+
+**问题原因及解决办法：**
+根据错误提示发现`cluster ID mismatch`，意思就是说 **集群ID不匹配**。更进一步说，应该是多个 etcd
+服务器之间的配置存在根本性差异，有可能是不同时期配置时产生的。为了消除这种差异，需将 etcd 的缓存清除后，再重新启动。具体操作如下：
+
+```bash
+#
+在每个 etcd 节点进行如下操作
+systemctl stop etcd
+rm -rf /var/lib/etcd/*
+systemctl start
+etcd
+```
+
+2019.09.07
+
+**问题**：部署 docker 出现错误：
+```
+TASK [docker : fail info1]
+*************************************************************************************************************************************
+fatal: [192.168.20.201]: FAILED! => {"changed": false, "msg": "Containerd
+already installed!"}
+fatal: [192.168.20.203]: FAILED! => {"changed": false,
+"msg": "Containerd already installed!"}
+
+```
+
+**原因及解决办法**:
+在进行 `ansible-playbook
+03.docker.yml` 部署时，原来安装的 `docker-ce` 版本 默认 安装了 `containerd.io` 软件包，在卸载 `docker-
+ce`时，需要手动卸载，否则就会出现再次安装其它版本的 `docker`时，安装不上的问题，就会出现上面的情况。
+解决办法：
+
+```bash
+#
+在部署服务器上执行下面指令卸载 `containerd.io`，这里的 <remote_ip> 指的是 `192.168.20.201`
+`192.168.20.203`
+ssh <remote_ip> yum remove -y containerd.io
+
+# 重新部署
+ansible-
+playbook 03.docker.yml
+```
+
+2019.09.07
+
+**问题:**
+```
+TASK [kube-master : 创建 kubernetes 证书签名请求]
+**************************************************************************************************************
+fatal: [192.168.20.201]: FAILED! => {"changed": false, "msg": "AnsibleError: An
+unhandled exception occurred while templating '{{ SERVICE_CIDR | ipaddr('net') |
+ipaddr(1) | ipaddr('address') }}'. Error was a <class
+'ansible.errors.AnsibleFilterError'>, original message: The ipaddr filter
+requires python's netaddr be installed on the ansible controller"}
+fatal:
+[192.168.20.203]: FAILED! => {"changed": false, "msg": "AnsibleError: An
+unhandled exception occurred while templating '{{ SERVICE_CIDR | ipaddr('net') |
+ipaddr(1) | ipaddr('address') }}'. Error was a <class
+'ansible.errors.AnsibleFilterError'>, original message: The ipaddr filter
+requires python's netaddr be installed on the ansible controller"}
+```
+**解决办法:**
+错误提示中提到`he ipaddr filter requires python's netaddr be installed on the
+ansible controller`。安装 Python 库 `netaddr`: `pip install -y netaddr`
+
 ## Appendix
 
 - Ubuntu 1604 安装 ansible 如果出现以下错误

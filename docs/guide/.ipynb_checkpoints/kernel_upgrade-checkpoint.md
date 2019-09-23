@@ -9,9 +9,6 @@ https://www.elrepo.org，主要提供各种硬件驱动（显卡、网卡、声�
 内核升级。如下按照网站提示载入elrepo公钥及最新elrepo版本，然后按步骤升级内核（以安装长期支持版本 kernel-lt 为例）
 
 ```{.python .input}
-# 切换 docker-ce 软件源到阿里云
-test $(rpm -qa yum-config-manager) || yum install -y yum-utils
-
 # 载入公钥
 rpm --import https://www.elrepo.org/RPM-GPG-KEY-elrepo.org
 # 安装ELRepo

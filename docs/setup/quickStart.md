@@ -67,6 +67,43 @@ $ kubectl get pod --all-namespaces  # 验证集群pod状态，默认已安装网
 $ kubectl get svc --all-namespaces  # 验证集群服务状态
 ```
 
+```{.python .input}
+[root@wfh_deploy ansible]# kubectl get node
+NAME             STATUS                     ROLES    AGE     VERSION
+192.168.20.201   Ready,SchedulingDisabled   master   13m     v1.15.2
+192.168.20.203   Ready,SchedulingDisabled   master   13m     v1.15.2
+192.168.20.204   Ready                      node     9m10s   v1.15.2
+192.168.20.205   Ready                      node     9m10s   v1.15.2
+192.168.20.206   Ready                      node     9m10s   v1.15.2
+```
+
+```{.python .input}
+[root@wfh_deploy ansible]# kubectl get pod --all-namespaces
+NAMESPACE     NAME                                          READY   STATUS    RESTARTS   AGE
+kube-system   coredns-797455887b-ntwq5                      1/1     Running   0          8m4s
+kube-system   coredns-797455887b-ssdb5                      1/1     Running   0          8m4s
+kube-system   heapster-5f848f54bc-d969p                     1/1     Running   0          6m19s
+kube-system   kube-flannel-ds-amd64-424sr                   1/1     Running   0          8m59s
+kube-system   kube-flannel-ds-amd64-659sj                   1/1     Running   0          8m59s
+kube-system   kube-flannel-ds-amd64-ch8lw                   1/1     Running   0          8m59s
+kube-system   kube-flannel-ds-amd64-fs578                   1/1     Running   0          8m59s
+kube-system   kube-flannel-ds-amd64-g6rms                   1/1     Running   0          8m59s
+kube-system   kubernetes-dashboard-5c7687cf8-pgw77          1/1     Running   0          6m20s
+kube-system   metrics-server-85c7b8c8c4-gkgmb               1/1     Running   0          7m58s
+kube-system   traefik-ingress-controller-766dbfdddd-mk7b5   1/1     Running   0          5m54s
+```
+
+```{.python .input}
+[root@wfh_deploy ansible]# kubectl get svc --all-namespaces
+NAMESPACE     NAME                      TYPE        CLUSTER-IP      EXTERNAL-IP   PORT(S)                       AGE
+default       kubernetes                ClusterIP   10.68.0.1       <none>        443/TCP                       15m
+kube-system   heapster                  ClusterIP   10.68.102.12    <none>        80/TCP                        6m46s
+kube-system   kube-dns                  ClusterIP   10.68.0.2       <none>        53/UDP,53/TCP,9153/TCP        8m31s
+kube-system   kubernetes-dashboard      NodePort    10.68.238.192   <none>        443:32810/TCP                 6m47s
+kube-system   metrics-server            ClusterIP   10.68.101.33    <none>        443/TCP                       8m25s
+kube-system   traefik-ingress-service   NodePort    10.68.241.20    <none>        80:23456/TCP,8080:35830/TCP   6m20s
+```
+
 - 登陆 `dashboard`可以查看和管理集群，更多内容请查阅[dashboard文档](../guide/dashboard.md)
 
 ### 6.清理

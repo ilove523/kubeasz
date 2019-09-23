@@ -244,5 +244,5 @@ vi harbor.cfg
 
 ## 参考
 
-+
+1.
 [harbor服务器](https://cloud.tencent.com/developer/information/harbor%E6%9C%8D%E5%8A%A1%E5%99%A8)
