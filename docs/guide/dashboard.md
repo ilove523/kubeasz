@@ -233,16 +233,13 @@ kubernetes-dashboard        NodePort    10.68.248.56   <none>        443:37070/T
 ```bash
 ## 创建集群
 [root@wfh_node01 ~]# 
-$
-kubectl config set-cluster kubernetes \
-    --certificate-
-authority=/etc/kubernetes/ssl/ca.pem \
---server="https://192.168.20.201:6443" \
+$ kubectl config set-cluster kubernetes \
+    --certificate-authority=/etc/kubernetes/ssl/ca.pem \
+    --server="https://192.168.20.201:6443" \
     --embed-certs=true \
---kubeconfig=/root/.kube/admin-user-token.conf
+    --kubeconfig=/root/.kube/admin-user-token.conf
 ## 输出结果：
-Cluster "kubernetes"
-set.
+Cluster "kubernetes" set.
 ```
 
 ```bash
@@ -250,13 +247,12 @@ set.
 [root@wfh_node01 ~]#
 $ alias ksys='kubectl -n kube-system'
 $ ADMIN_TOKEN=$(ksys get secrets \
-    $(ksys get secret -o name | grep admin-
-user | awk -F '/' '{print $2}') \
+    $(ksys get secret -o name | grep admin-user | awk -F '/' '{print $2}') \
     -o jsonpath={.data.token}|base64 -d)
 
 ## 使用以上的秘钥完善配置文件
 $ kubectl config set-credentials admin-user-token \
---token=$ADMIN_TOKEN \
+    --token=$ADMIN_TOKEN \
     --kubeconfig=/root/.kube/admin-user-token.conf
 ## 输出结果：
 User "admin-user-token" set.
@@ -265,16 +261,13 @@ User "admin-user-token" set.
 $ kubectl config set-context
 admin-user-token@kubernetes \
     --cluster=kubernetes \
-    --user=admin-user-
-token \
+    --user=admin-user-token \
     --kubeconfig=/root/.kube/admin-user-token.conf
 ## 输出结果：
-Context
-"admin-user-token@kubernetes" created.
+Context "admin-user-token@kubernetes" created.
 
 ## 设置登录用户
-$ kubectl config use-context
-admin-user-token@kubernetes \
+$ kubectl config use-context admin-user-token@kubernetes \
     --kubeconfig=/root/.kube/admin-user-token.conf
 ## 输出结果：
 Switched to context "admin-user-token@kubernetes".
@@ -296,9 +289,7 @@ Switched to context "admin-user-token@kubernetes".
 ```
 然后在客户端浏览器输入下面的地址：
 
-http://192.168.20.201:8001/api/v1/namespaces/kubernetes-
-dashboard/services/https:kubernetes-dashboard:/proxy/#!/login
+http://192.168.20.201:8001/api/v1/namespaces/kubernetes-dashboard/services/https:kubernetes-dashboard:/proxy/#!/login
 上面两种方式只能进到登录界面，都需要下面的步骤才能完成登录：
 
-**选择 `Kubeconfig`方式登录，将上一节获得的`admin-user-
-token.conf`文件加载进来，点击【sign】，就可登录了。**
+**选择 `Kubeconfig`方式登录，将上一节获得的`admin-user-token.conf`文件加载进来，点击【sign】，就可登录了。**
