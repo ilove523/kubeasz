@@ -8,7 +8,7 @@
 + haproxy：用于请求转发到多个 apiserver，详见[HA-2x 架构](00-planning_and_overall_intro.md#ha-architecture)
 + calico： 配置容器网络 (或者其他网络组件)
 
-``` bash
+```bash
 roles/kube-node/
 ├── defaults
 │   └── main.yml		# 变量配置文件
@@ -41,7 +41,7 @@ roles/kube-node/
 
 + 必须先创建工作目录 `/var/lib/kubelet`
 
-``` bash
+```ini
 [Unit]
 Description=Kubernetes Kubelet
 Documentation=https://github.com/GoogleCloudPlatform/kubernetes
@@ -106,7 +106,7 @@ WantedBy=multi-user.target
 
 ### 创建 kube-proxy服务文件
 
-``` bash
+```ini
 [Unit]
 Description=Kubernetes Kube-Proxy Server
 Documentation=https://github.com/GoogleCloudPlatform/kubernetes
@@ -133,19 +133,32 @@ WantedBy=multi-user.target
 
 ### 验证 node 状态
 
-``` bash
-systemctl status kubelet	# 查看状态
+```bash
+# 查看状态
+systemctl status kubelet
 systemctl status kube-proxy
-journalctl -u kubelet		# 查看日志
+# 查看日志
+journalctl -u kubelet
 journalctl -u kube-proxy 
 ```
-运行 `kubectl get node` 可以看到类似
 
-``` bash
+运行 `kubectl get node` 可以看到类似
+```ini
 NAME           STATUS    ROLES     AGE       VERSION
 192.168.1.42   Ready     <none>    2d        v1.9.0
 192.168.1.43   Ready     <none>    2d        v1.9.0
 192.168.1.44   Ready     <none>    2d        v1.9.0
+```
+
+2019.09.23 获取到的信息
+```ini
+NAME             STATUS                     ROLES    AGE    VERSION
+192.168.20.201   Ready,SchedulingDisabled   master   13d    v1.15.2
+192.168.20.202   Ready,SchedulingDisabled   master   13d    v1.15.2
+192.168.20.203   NotReady                   node     13d    v1.15.2
+192.168.20.204   Ready                      node     13d    v1.15.2
+192.168.20.205   Ready                      node     13d    v1.15.2
+192.168.20.206   Ready                      node     7d3h   v1.15.2
 ```
 
 
