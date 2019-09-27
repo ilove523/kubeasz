@@ -1,73 +1,70 @@
 ## harbor 镜像仓库
 
-Habor是由VMWare中国团队开源的容器镜像仓库。事实上，Habor是在Docker
-Registry上进行了相应的企业级扩展，从而获得了更加广泛的应用，这些新的企业级特性包括：管理用户界面，基于角色的访问控制
-，水平扩展，同步，AD/LDAP集成以及审计日志等。本文档仅说明部署单个基础harbor服务的步骤。
+Habor是由VMWare中国团队开源的容器镜像仓库。事实上，Habor是在Docker Registry上进行了相应的企业级扩展，从而获得了更加广泛的应用，这些新的企业级特性包括：管理用户界面，基于角色的访问控制，水平扩展，同步，AD/LDAP 集成以及审计日志等。
 
-- 目录
-  - 安装步骤
-  - 安装讲解
-  -
-配置docker/containerd信任harbor证书
-  - 在k8s集群使用harbor
-  - 管理维护
+本文档仅说明部署单个基础harbor服务的步骤。
 
-### 安装步骤
+<!-- TOC -->
 
-1.
-在ansible控制端下载最新的 [docker-compose](https://github.com/docker/compose/releases)
-二进制文件，改名后把它放到项目 `/etc/ansible/bin`目录（已包含）
+- [harbor 镜像仓库](#harbor-%E9%95%9C%E5%83%8F%E4%BB%93%E5%BA%93)
+    - [安装步骤](#%E5%AE%89%E8%A3%85%E6%AD%A5%E9%AA%A4)
+    - [安装讲解](#%E5%AE%89%E8%A3%85%E8%AE%B2%E8%A7%A3)
+    - [配置docker/containerd信任harbor证书](#%E9%85%8D%E7%BD%AEdockercontainerd%E4%BF%A1%E4%BB%BBharbor%E8%AF%81%E4%B9%A6)
+        - [docker配置信任harbor证书](#docker%E9%85%8D%E7%BD%AE%E4%BF%A1%E4%BB%BBharbor%E8%AF%81%E4%B9%A6)
+        - [containerd配置信任harbor证书](#containerd%E9%85%8D%E7%BD%AE%E4%BF%A1%E4%BB%BBharbor%E8%AF%81%E4%B9%A6)
+    - [在k8s集群使用harbor](#%E5%9C%A8k8s%E9%9B%86%E7%BE%A4%E4%BD%BF%E7%94%A8harbor)
+        - [镜像上传](#%E9%95%9C%E5%83%8F%E4%B8%8A%E4%BC%A0)
+        - [k8s中使用harbor](#k8s%E4%B8%AD%E4%BD%BF%E7%94%A8harbor)
+    - [管理维护](#%E7%AE%A1%E7%90%86%E7%BB%B4%E6%8A%A4)
+        - [harbor 升级](#harbor-%E5%8D%87%E7%BA%A7)
+- [参考](#%E5%8F%82%E8%80%83)
 
-2. 在ansible控制端下载最新的
-[harbor](https://github.com/vmware/harbor/releases) 离线安装包，把它放到项目
-`/etc/ansible/down` 目录
+<!-- /TOC -->
 
-3. 在ansible控制端编辑/etc/ansible/hosts文件，可以参考
-`example`目录下的模板，修改部分举例如下
+### 快速安装步骤
 
-```{.python .input}
-# 参数 NEW_INSTALL=(yes/no)：yes表示新建 harbor，并配置k8s节点的docker可以使用harbor仓库
-# no 表示仅配置k8s节点的docker使用已有的harbor仓库
-# 如果不需要设置域名访问 harbor，可以配置参数 HARBOR_DOMAIN=""
-[harbor]
-192.168.1.8 HARBOR_DOMAIN="harbor.yourdomain.com" NEW_INSTALL=yes
-```
+1. 在ansible控制端下载最新的 [docker-compose](https://github.com/docker/compose/releases)二进制文件，改名后把它放到项目 `/etc/ansible/bin`目录（已包含）
 
-4. 在ansible控制端执行 `ansible-playbook /etc/ansible/11.harbor.yml`，完成harbor安装和docker
-客户端配置
+2. 在ansible控制端下载最新的[harbor](https://github.com/vmware/harbor/releases) 离线安装包，把它放到项目`/etc/ansible/down` 目录
 
-- 安装验证
+3. 在ansible控制端编辑/etc/ansible/hosts文件，可以参考`example`目录下的模板，修改部分举例如下
 
-1. 在harbor节点使用`docker ps -a` 查看harbor容器组件运行情况
-1.
-浏览器访问harbor节点的IP地址 `https://$NodeIP`，使用账号 admin 和 密码 Harbor12345 (harbor.cfg
-配置文件中的默认)登陆系统
+    ```yaml
+    # 参数 NEW_INSTALL=(yes/no)：yes表示新建 harbor，并配置k8s节点的docker可以使用harbor仓库
+    # no 表示仅配置k8s节点的docker使用已有的harbor仓库
+    # 如果不需要设置域名访问 harbor，可以配置参数 HARBOR_DOMAIN=""
+    [harbor]
+    192.168.20.206 HARBOR_DOMAIN="harbor.wfh.net" NEW_INSTALL=yes
+    ```
 
-### 安装讲解
+4. 在ansible控制端执行 `ansible-playbook /etc/ansible/11.harbor.yml`，完成harbor安装和docker 客户端配置
 
-根据`11.harbor.yml`文件，harbor节点需要以下步骤：
+5. 安装验证
+    + 在harbor节点使用`docker ps -a` 查看harbor容器组件运行情况
+    + 浏览器访问harbor节点的IP地址 `https://$NodeIP`，使用账号 admin 和 密码 Harbor12345 (harbor.cfg 配置文件中的默认)登陆系统
 
-- role `prepare`
-基础系统环境准备
+### 自动化部署概述
+
+根据[11.harbor.yml](/11.harbor.yml)文件，harbor节点需要以下步骤：
+
+- role `prepare`基础系统环境准备
 - role `docker` 安装docker
 - role `harbor` 安装harbor
-- 注意：`kube-
-node`节点在harbor部署完之后，需要配置harbor的证书（详见下节配置docker/containerd信任harbor证书），并可以在hosts里面添加harbor的域名解析，如果你的环境中有dns服务器，可以跳过hosts文件设置
+
+> 注意：`kube-node`节点在harbor部署完之后，需要配置harbor的证书（详见下节配置docker/containerd信任harbor证书），并可以在hosts里面添加harbor的域名解析，如果你的环境中有dns服务器，可以跳过hosts文件设置
 请在另外窗口打开 [roles/harbor/tasks/main.yml](../../roles/harbor/tasks/main.yml)，对照以下讲解
 1. 下载docker-compose可执行文件到$PATH目录
 1. 自注册变量result判断是否已经安装harbor，避免重复安装问题
-1.
-解压harbor离线安装包到指定目录
+1. 解压harbor离线安装包到指定目录
 1. 导入harbor所需 docker images
 1. 创建harbor证书和私钥(复用集群的CA证书)
-1.
-修改harbor.cfg配置文件
+1. 修改harbor.cfg配置文件
 1. 启动harbor安装脚本
 
 ### 配置docker/containerd信任harbor证书
 因为我们创建的harbor仓库使用了自签证书，所以当docker/containerd客户端拉取自建harbor仓库镜像前必须配置信任harbor证书，否则出现如下错误：
 
-```{.python .input}
+```bash
 # docker
 $ docker pull harbor.test.lo/pub/hello:v0.1.4
 Error response from daemon: Get https://harbor.test.lo/v1/_ping: x509: certificate signed by unknown authority
@@ -77,37 +74,29 @@ $ crictl pull harbor.test.lo/pub/hello:v0.1.4
 FATA[0000] pulling image failed: rpc error: code = Unknown desc = failed to resolve image "harbor.test.lo/pub/hello:v0.1.4": no available registry endpoint: failed to do request: Head https://harbor.test.lo/v2/pub/hello/manifests/v0.1.4: x509: certificate signed by unknown authority
 ```
 
-项目脚本`11.harbor.yml`中已经自动为k8s集群的每个node节点配置 docker/containerd 信任自建 harbor
-证书；如果你无法运行此脚本，可以参考下述手工配置
+项目脚本`11.harbor.yml`中已经自动为k8s集群的每个node节点配置 docker/containerd 信任自建 harbor证书；如果你无法运行此脚本，可以参考下述手工配置
 
 #### docker配置信任harbor证书
 
 在集群每个 node 节点进行如下配置
 
-- 创建目录
-/etc/docker/certs.d/harbor.test.lo/  (harbor.test.lo为你的harbor域名)
-- 复制 harbor
-安装时的 CA 证书到上述目录，并改名 ca.crt 即可
+- 创建目录 /etc/docker/certs.d/harbor.test.lo/  (harbor.test.lo为你的harbor域名)
+- 复制 harbor 安装时的 CA 证书到上述目录，并改名 ca.crt 即可
 
 #### containerd配置信任harbor证书
 
-在集群每个 node
-节点进行如下配置（假设ca.pem为自建harbor的CA证书）
+在集群每个 node 节点进行如下配置（假设ca.pem为自建harbor的CA证书）
 
 - ubuntu 1604:
-  - cp ca.pem /usr/share/ca-
-certificates/harbor-ca.crt
+  - cp ca.pem /usr/share/ca-certificates/harbor-ca.crt
   - echo harbor-ca.crt >> /etc/ca-certificates.conf
--
-update-ca-certificates
+- update-ca-certificates
 
 - CentOS 7:
-  - cp ca.pem /etc/pki/ca-
-trust/source/anchors/harbor-ca.crt
+  - cp ca.pem /etc/pki/ca-trust/source/anchors/harbor-ca.crt
   - update-ca-trust
 
-上述配置完成后，重启 containerd 即可
-`systemctl restart containerd`
+上述配置完成后，重启 containerd 即可 `systemctl restart containerd`。
 
 ### 在k8s集群使用harbor
 admin用户web登陆后可以方便的创建项目，并指定项目属性(公开或者私有)；然后创建用户，并在项目`成员`选项中选择用户和权限；
@@ -117,15 +106,17 @@ admin用户web登陆后可以方便的创建项目，并指定项目属性(公�
 使用docker客户端登陆`harbor.test.com`，然后把镜像tag成 `harbor.test.com/$项目名/$镜像名:$TAG`
 之后，即可使用docker push 上传
 
-```{.python .input}
+```bash
 docker login harbor.test.com
-Username: 
+```
+```ini
+Username:
 Password:
 Login Succeeded
 docker tag busybox:latest harbor.test.com/library/busybox:latest
 docker push harbor.test.com/library/busybox:latest
 The push refers to a repository [harbor.test.com/library/busybox]
-0271b8eebde3: Pushed 
+0271b8eebde3: Pushed
 latest: digest: sha256:91ef6c1c52b166be02645b8efee30d1ee65362024f7da41c404681561734c465 size: 527
 ```
 
@@ -133,7 +124,7 @@ latest: digest: sha256:91ef6c1c52b166be02645b8efee30d1ee65362024f7da41c404681561
 
 1. 如果镜像保存在harbor中的公开项目中，那么只需要在yaml文件中简单指定harbor私有镜像即可，例如
 
-```{.python .input}
+```yaml
 apiVersion: v1
 kind: Pod
 metadata:
@@ -147,7 +138,7 @@ spec:
 
 2. 如果镜像保存在harbor中的私有项目中，那么yaml文件中使用该私有项目的镜像需要指定`imagePullSecrets`，例如
 
-```{.python .input}
+```yaml
 apiVersion: v1
 kind: Pod
 metadata:
@@ -163,13 +154,18 @@ spec:
 
 其中 `harborKey1`可以用以下两种方式生成：
 
-+ 1.使用 `kubectl create secret docker-registry
-harborkey1 --docker-server=harbor.test.com --docker-username=admin --docker-
-password=Harbor12345 --docker-email=team@test.com`
++ 1.使用下面的指令生成
+```bash
+kubectl create secret docker-registry harborkey1 \
+    --docker-server=harbor.test.com \
+    --docker-username=admin \
+    --docker-password=Harbor12345 \
+    --docker-email=team@test.com
+```
 + 2.使用yaml配置文件生成
 
-```{.python .input}
-//harborkey1.yaml
+```yaml
+# harborkey1.yaml
 apiVersion: v1
 kind: Secret
 metadata:
@@ -180,27 +176,22 @@ data:
 type: kubernetes.io/dockerconfigjson
 ```
 
-前面docker login会在~/.docker下面创建一个config.json文件保存鉴权串，这里secret
-yaml的.dockerconfigjson后面的数据就是那个json文件的base64编码输出（-w 0让base64输出在单行上，避免折行）
+前面docker login会在~/.docker下面创建一个config.json文件保存鉴权串，这里secret yaml的.dockerconfigjson后面的数据就是那个json文件的base64编码输出（-w 0让base64输出在单行上，避免折行）
 
-###
-管理维护
+### 管理维护
 
 + 日志目录 `/var/log/harbor`
-+ 数据目录 `/data` ，其中最主要是 `/data/database` 和
-`/data/registry` 目录，如果你要彻底重新安装harbor，删除这两个目录即可
++ 数据目录 `/data` ，其中最主要是 `/data/database` 和 `/data/registry` 目录，如果你要彻底重新安装harbor，删除这两个目录即可
 
-先进入harbor安装目录 `cd
-/data/harbor`，常规操作如下：
+先进入harbor安装目录 `cd /data/harbor`，常规操作如下：
 
 1. 暂停harbor `docker-compose stop` : docker容器stop，并不删除容器
 2. 恢复harbor `docker-compose start` : 恢复docker容器运行
-3. 停止harbor `docker-compose
-down -v` : 停止并删除docker容器
+3. 停止harbor `docker-compose down -v` : 停止并删除docker容器
 4. 启动harbor `docker-compose up -d` : 启动所有docker容器
 修改harbor的运行配置，需要如下步骤：
 
-```{.python .input}
+```bash
 # 停止 harbor
  docker-compose down -v
 # 修改配置
@@ -215,7 +206,7 @@ down -v` : 停止并删除docker容器
 
 以下步骤基于harbor 1.1.2 版本升级到 1.2.2版本
 
-```{.python .input}
+```bash
 # 进入harbor解压缩后的目录，停止harbor
 cd /data/harbor
 docker-compose down
@@ -244,5 +235,4 @@ vi harbor.cfg
 
 ## 参考
 
-+
-[harbor服务器](https://cloud.tencent.com/developer/information/harbor%E6%9C%8D%E5%8A%A1%E5%99%A8)
++ [harbor服务器](https://cloud.tencent.com/developer/information/harbor%E6%9C%8D%E5%8A%A1%E5%99%A8)

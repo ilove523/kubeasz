@@ -1,0 +1,5 @@
+# to install network plugin, only one can be choosen 
+- hosts:
+  - kube-master
+  roles:
+  - { role: kube-ovn-addon, when: "CLUSTER_NETWORK == 'kube-ovn'" }

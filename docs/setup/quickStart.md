@@ -5,8 +5,7 @@
 ### 基础系统配置
 - 准备一台虚机配置内存2G/硬盘30G以上
 - 最小化安装`Ubuntu 16.04 server`或者`CentOS 7 Minimal`
--
-配置基础网络、更新源、SSH登陆等
+- 配置基础网络、更新源、SSH登陆等
 
 ### 下载文件
 
@@ -20,14 +19,13 @@ $ ./easzup -D
 
 上述脚本运行成功后，所有文件（kubeasz代码、二进制、离线镜像）均已整理好放入目录`/etc/ansilbe`
 
-- `/etc/ansible` 包含
-kubeasz 版本为 ${release} 的发布代码
+- `/etc/ansible` 包含kubeasz 版本为 ${release} 的发布代码
 - `/etc/ansible/bin` 包含 k8s/etcd/docker/cni 等二进制文件
 - `/etc/ansible/down` 包含集群安装时需要的离线容器镜像
 
 ### 配置 ssh 免密登陆
 
-```{.python .input}
+```bash
 ssh-keygen -t rsa -b 2048 回车 回车 回车
 ssh-copy-id $IP  # $IP 为所有节点地址包括自身，按照提示输入 yes 和 root 密码
 ```
@@ -59,15 +57,15 @@ $ docker exec -it kubeasz sh
 
 如果提示kubectl: command not found，退出重新ssh登陆一下，环境变量生效即可
 
-```{.python .input}
-$ kubectl version                   # 验证集群版本     
+```bash
+$ kubectl version                   # 验证集群版本
 $ kubectl get componentstatus       # 验证 scheduler/controller-manager/etcd等组件状态
 $ kubectl get node                  # 验证节点就绪 (Ready) 状态
 $ kubectl get pod --all-namespaces  # 验证集群pod状态，默认已安装网络插件、coredns、metrics-server等
 $ kubectl get svc --all-namespaces  # 验证集群服务状态
 ```
 
-```{.python .input}
+```bash
 [root@wfh_deploy ansible]# kubectl get node
 NAME             STATUS                     ROLES    AGE     VERSION
 192.168.20.201   Ready,SchedulingDisabled   master   13m     v1.15.2
@@ -77,7 +75,7 @@ NAME             STATUS                     ROLES    AGE     VERSION
 192.168.20.206   Ready                      node     9m10s   v1.15.2
 ```
 
-```{.python .input}
+```bash
 [root@wfh_deploy ansible]# kubectl get pod --all-namespaces
 NAMESPACE     NAME                                          READY   STATUS    RESTARTS   AGE
 kube-system   coredns-797455887b-ntwq5                      1/1     Running   0          8m4s

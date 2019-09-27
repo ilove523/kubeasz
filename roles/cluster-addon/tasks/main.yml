@@ -3,14 +3,6 @@
   with_items:
   - /opt/kube/kube-system
 
-# 设置 dns svc ip (这里选用 SERVICE_CIDR 中第2个IP)
-- name: 注册变量 DNS_SVC_IP
-  shell: echo {{ SERVICE_CIDR }}|cut -d/ -f1|awk -F. '{print $1"."$2"."$3"."$4+2}'
-  register: DNS_SVC_IP
-
-- name: 设置变量 CLUSTER_DNS_SVC_IP
-  set_fact: CLUSTER_DNS_SVC_IP={{ DNS_SVC_IP.stdout }}
-
 # DNS文件中部分参数根据hosts文件设置而定，因此需要用template模块替换参数
 - name: 准备 DNS的部署文件
   template: src={{ item }}.yaml.j2 dest=/opt/kube/kube-system/{{ item }}.yaml
@@ -48,7 +40,7 @@
           when: 'dns_offline in image_info.stdout and CONTAINER_RUNTIME == "containerd"'
     
     - name: 创建{{ dns_backend }}部署
-      shell: "{{ bin_dir }}/kubectl apply -f /opt/kube/kube-system/{{ dns_backend }}.yaml"
+      shell: "{{ bin_dir }}/kubectl create -f /opt/kube/kube-system/{{ dns_backend }}.yaml"
       run_once: true
   when: 
   - '"kube-dns" not in pod_info.stdout'
@@ -75,7 +67,7 @@
           when: 'metricsserver_offline in image_info.stdout and CONTAINER_RUNTIME == "containerd"'
     
     - name: 创建 metrics-server部署
-      shell: "{{ base_dir }}/bin/kubectl apply -f {{ base_dir }}/manifests/metrics-server"
+      shell: "{{ base_dir }}/bin/kubectl create -f {{ base_dir }}/manifests/metrics-server"
       run_once: true
       connection: local
   when: '"metrics-server" not in pod_info.stdout and metricsserver_install == "yes"'
@@ -110,8 +102,8 @@
           when: "item in image_info.stdout and CONTAINER_RUNTIME == 'containerd'"
 
     - name: 创建 dashboard部署
-      shell: "{{ base_dir }}/bin/kubectl apply -f {{ base_dir }}/manifests/dashboard && \
-	      {{ base_dir }}/bin/kubectl apply -f {{ base_dir }}/manifests/heapster/heapster-only"
+      shell: "{{ base_dir }}/bin/kubectl create -f {{ base_dir }}/manifests/dashboard && \
+	      {{ base_dir }}/bin/kubectl create -f {{ base_dir }}/manifests/heapster/heapster-only"
       run_once: true
       connection: local
   when: '"kubernetes-dashboard" not in pod_info.stdout and dashboard_install == "yes"'
@@ -145,8 +137,8 @@
       - "{{ metallb_protocol }}.yaml"
 
     - name: 创建 metallb controller 部署
-      shell: "{{ bin_dir }}/kubectl apply -f /opt/kube/kube-system/metallb.yaml && \
-	      {{ bin_dir }}/kubectl apply -f /opt/kube/kube-system/{{ metallb_protocol }}.yaml"
+      shell: "{{ bin_dir }}/kubectl create -f /opt/kube/kube-system/metallb.yaml && \
+	      {{ bin_dir }}/kubectl create -f /opt/kube/kube-system/{{ metallb_protocol }}.yaml"
       run_once: true
   when: '"metallb" not in pod_info.stdout and metallb_install == "yes"'
   ignore_errors: true

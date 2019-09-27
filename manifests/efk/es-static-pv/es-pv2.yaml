@@ -12,6 +12,6 @@ spec:
   storageClassName: "es-storage-class"
   nfs:
     # 根据实际共享目录修改
-    path: /share/es2
+    path: /home/share/es2
     # 根据实际 nfs服务器地址修改
-    server: 192.168.1.208
+    server: 192.168.20.201

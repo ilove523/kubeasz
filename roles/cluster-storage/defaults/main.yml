@@ -2,8 +2,8 @@
 storage:
   # nfs server 参数
   nfs:
-    enabled: "no"
-    server: "172.16.3.86"
+    enabled: "yes"
+    server: "192.168.20.201"
     server_path: "/data/nfs"
     storage_class: "nfs-dynamic-class"
     provisioner_name: "nfs-provisioner-01"

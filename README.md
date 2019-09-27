@@ -53,8 +53,8 @@
         <td><a href="docs/guide/kubedns.md">DNS</a></td>
         <td><a href="docs/guide/dashboard.md">dashboard</a></td>
         <td><a href="docs/guide/metrics-server.md">metrics-server</a></td>
-        <td><a href="docs/guide/prometheus.ipynb">prometheus</a></td>
-        <td><a href="docs/guide/efk.ipynb">efk</a></td>
+        <td><a href="docs/guide/prometheus.md">prometheus</a></td>
+        <td><a href="docs/guide/efk.md">efk</a></td>
         <td><a href="docs/guide/ingress.md">ingress</a></td>
     </tr>
     <tr>
@@ -102,6 +102,9 @@
     - [feisky-Kubernetes指南](https://github.com/feiskyer/kubernetes-handbook/blob/master/SUMMARY.md)
     - [rootsongjc-Kubernetes指南](https://github.com/rootsongjc/kubernetes-handbook)
     - [opsnull-安装教程](https://github.com/opsnull/follow-me-install-kubernetes-cluster)
+
+## 关于集群部署实践推荐
++ [东方国信基于kubernetes构建容器云平台的实践和思考](https://www.kubernetes.org.cn/3314.html)
 
 ## 贡献&致谢
 - [如何 PR](docs/mixes/HowToContribute.md)

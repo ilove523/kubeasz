@@ -113,6 +113,36 @@ test-ns       nginx-755464dd6c-zct56                  1/1     Running   0       
 
 - 更多的测试（pod网络QOS限速，namespace网络隔离等）请参考 kube-ovn 项目说明文档
 
+### 错误记录
+
+```ini
+[root@wfh_deploy ansible]# kubectl get pods,svc  --all-namespaces -o wide
+NAMESPACE     NAME                                              READY   STATUS             RESTARTS   AGE     IP               NODE             NOMINATED NODE   READINESS GATES
+kube-ovn      pod/kube-ovn-cni-4rb5v                            1/1     Running            14         83m     192.168.20.206   192.168.20.206   <none>           <none>
+kube-ovn      pod/kube-ovn-cni-r2pz8                            1/1     Running            8          83m     192.168.20.202   192.168.20.202   <none>           <none>
+kube-ovn      pod/kube-ovn-cni-r5tnh                            1/1     Running            4          83m     192.168.20.201   192.168.20.201   <none>           <none>
+kube-ovn      pod/kube-ovn-cni-s9vjx                            1/1     Running            7          83m     192.168.20.204   192.168.20.204   <none>           <none>
+kube-ovn      pod/kube-ovn-cni-tpcz6                            1/1     Running            7          83m     192.168.20.203   192.168.20.203   <none>           <none>
+kube-ovn      pod/kube-ovn-cni-xxr7g                            1/1     Running            3          83m     192.168.20.205   192.168.20.205   <none>           <none>
+kube-ovn      pod/kube-ovn-controller-8547cf6b5-pf794           1/1     Running            2          83m     192.168.20.202   192.168.20.202   <none>           <none>
+kube-ovn      pod/ovn-central-9ff49887f-drkgq                   1/1     Running            1          83m     192.168.20.201   192.168.20.201   <none>           <none>
+kube-ovn      pod/ovs-ovn-2hr9n                                 1/1     Running            4          83m     192.168.20.203   192.168.20.203   <none>           <none>
+kube-ovn      pod/ovs-ovn-5shrd                                 1/1     Running            1          83m     192.168.20.201   192.168.20.201   <none>           <none>
+kube-ovn      pod/ovs-ovn-g292l                                 1/1     Running            4          83m     192.168.20.202   192.168.20.202   <none>           <none>
+kube-ovn      pod/ovs-ovn-qn6ff                                 1/1     Running            2          83m     192.168.20.206   192.168.20.206   <none>           <none>
+kube-ovn      pod/ovs-ovn-rmbb5                                 1/1     Running            1          83m     192.168.20.205   192.168.20.205   <none>           <none>
+kube-ovn      pod/ovs-ovn-tx6gb                                 1/1     Running            4          83m     192.168.20.204   192.168.20.204   <none>           <none>
+kube-system   pod/coredns-797455887b-g6n94                      0/1     Running            1          10m     172.20.0.3       192.168.20.203   <none>           <none>
+kube-system   pod/coredns-797455887b-m7h7p                      0/1     Running            1          10m     172.20.0.4       192.168.20.206   <none>           <none>
+kube-system   pod/heapster-5f848f54bc-xkpnt                     1/1     Running            1          83m     172.20.0.7       192.168.20.204   <none>           <none>
+kube-system   pod/kubernetes-dashboard-5c7687cf8-w45f2          0/1     CrashLoopBackOff   7          9m51s   172.20.0.6       192.168.20.206   <none>           <none>
+kube-system   pod/metrics-server-85c7b8c8c4-766vs               0/1     CrashLoopBackOff   7          10m     172.20.0.5       192.168.20.203   <none>           <none>
+kube-system   pod/traefik-ingress-controller-766dbfdddd-2jb2j   1/1     Running            1          83m     172.20.0.2       192.168.20.204   <none>           <none>
+
+# 删除不能正常运行pod
+kubectl delete deployment,svc -n kube-system kube-dns coredns kubernetes-dashboard metrics-server
+```
+
 ### 延伸阅读
 
 - [kube-ovn 官方文档](https://github.com/alauda/kube-ovn/tree/master/docs)

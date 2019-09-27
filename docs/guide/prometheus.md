@@ -1,22 +1,19 @@
 # Prometheus
 
 随着`heapster`项目停止更新并慢慢被`metrics-
-server`取代，集群监控这项任务也将最终转移。`prometheus`的监控理念、数据结构设计其实相当精简，包括其非常灵活的查询语言；但是对于初学者来说，想要在k8s集群中实践搭建一套相对可用的部署却比较麻烦，由此还产生了不少专门的项目（如：[prometheus-
-operator](https://github.com/coreos/prometheus-operator)），本文介绍使用`helm
+server`取代，集群监控这项任务也将最终转移。`prometheus`的监控理念、数据结构设计其实相当精简，包括其非常灵活的查询语言；但是对于初学者来说，想要在k8s集群中实践搭建一套相对可用的部署却比较麻烦，由此还产生了不少专门的项目（如：[prometheus-operator](https://github.com/coreos/prometheus-operator)），本文介绍使用`helm
 chart`部署集群的prometheus监控。
 
 - `helm`已成为`CNCF`独立托管项目，预计会更加流行起来
 
 ## 前提
 
-- 安装
-helm：以本项目[安全安装helm](helm.md)为例
+- 安装 helm：以本项目[安全安装helm](helm.md)为例
 - 安装 [kube-dns](kubedns.md)
 
 ## 准备
 
-安装目录概览 `ll
-/etc/ansible/manifests/prometheus`
+安装目录概览 `ll /etc/ansible/manifests/prometheus`
 
 ```{.python .input}
 drwx------  3 root root  4096 Jun  3 22:42 grafana/
@@ -28,18 +25,12 @@ drwx------  3 root root  4096 Jun  2 21:39 prometheus/
 -rw-r-----  1 root root   294 May 30 18:09 prom-settings.yaml
 ```
 
-- 目录`prometheus/`和`grafana/`即官方的helm charts，可以使用`helm fetch --untar
-stable/prometheus` 和 `helm fetch --untar
-stable/grafana`下载，本安装不会修改任何官方charts里面的内容，这样方便以后跟踪charts版本的更新
-- `prom-
-settings.yaml`：个性化prometheus安装参数，比如禁用PV，禁用pushgateway，设置nodePort等
-- `prom-
-alertrules.yaml`：配置告警规则
+- 目录`prometheus/`和`grafana/`即官方的helm charts，可以使用`helm fetch --untar stable/prometheus` 和 `helm fetch --untar stable/grafana`下载，本安装不会修改任何官方charts里面的内容，这样方便以后跟踪charts版本的更新
+- `prom-settings.yaml`：个性化prometheus安装参数，比如禁用PV，禁用pushgateway，设置nodePort等
+- `prom-alertrules.yaml`：配置告警规则
 - `prom-alertsmanager.yaml`：配置告警邮箱设置等
-- `grafana-
-settings.yaml`：个性化grafana安装参数，比如用户名密码，datasources，dashboardProviders等
--
-`grafana-dashboards.yaml`：预设置dashboard
+- `grafana-settings.yaml`：个性化grafana安装参数，比如用户名密码，datasources，dashboardProviders等
+- `grafana-dashboards.yaml`：预设置dashboard
 
 ## 安装
 
@@ -98,21 +89,19 @@ Error: context deadline exceeded
 #
 切换到管理主机(wfh_node01)执行:
 [root@wfh_node01 ~]$ cd prometheus
-[root@wfh_node01
-prometheus]$ helm install --tls \
+[root@wfh_node01 prometheus]$
+helm install --tls \
     --name monitor \
-    --namespace
-monitoring \
+    --namespace monitoring \
     -f prom-settings.yaml \
     -f prom-alertsmanager.yaml \
-    -f
-prom-alertrules.yaml \
+    -f prom-alertrules.yaml \
     prometheus
 ```
 
 输出结果：
 
-```{.python .input}
+```ini
 NAME:   monitor
 LAST DEPLOYED: Sun Sep  8 17:34:28 2019
 NAMESPACE:
@@ -245,39 +234,35 @@ https://prometheus.io/
 
 根据提示，部署主机或管理主机上操作：
 
-```{.python .input}
-$ export NODE_PORT=$(kubectl get --namespace
-monitoring -o jsonpath="{.spec.ports[0].nodePort}" services monitor-prometheus-
-server)
-$ export NODE_IP=$(kubectl get nodes --namespace monitoring -o
-jsonpath="{.items[0].status.addresses[0].address}")
-$ echo $NODE_PORT $NODE_IP
+```bash
+$ export NODE_PORT=$(kubectl get --namespace monitoring -o jsonpath="{.spec.ports[0].nodePort}" services monitor-prometheus-server)
+$ export NODE_IP=$(kubectl get nodes --namespace monitoring -o jsonpath="{.items[0].status.addresses[0].address}")
+$ echo $NODE_IP：$NODE_PORT
 ```
 
 输出结果：
 
-```{.python .input}
-39000 192.168.20.201
+```ini
+192.168.20.201：39000
 ```
 
 ### 通过　helm 部署　grafana
 
 输入指令：
 
-```{.python .input}
-[root@wfh_node01 prometheus]$ helm
-install --tls \
->     --name grafana \
->     --namespace monitoring \
->     -f
-grafana-settings.yaml \
->     -f grafana-dashboards.yaml \
->     grafana
+```bash
+[root@wfh_node01 prometheus]$
+helm install --tls \
+     --name grafana \
+     --namespace monitoring \
+     -f grafana-settings.yaml \
+     -f grafana-dashboards.yaml \
+     grafana
 ```
 
 输出结果：
 
-```{.python .input}
+```ini
 NAME:   grafana
 LAST DEPLOYED: Sun Sep  8 18:07:57 2019
 NAMESPACE:
@@ -380,7 +365,7 @@ username: admin
 
 ```{.python .input .bash}
 # 查看相关pod和svc
-$ kubectl get pod,svc -n monitoring 
+$ kubectl get pod,svc -n monitoring
 NAME                                                     READY     STATUS    RESTARTS   AGE
 grafana-54dc76d47d-2mk55                                 1/1       Running   0          1m
 monitor-prometheus-alertmanager-6d9d9b5b96-w57bk         2/2       Running   0          2m
@@ -442,16 +427,13 @@ service/monitor-prometheus-server               NodePort    10.68.60.193    <non
 ```
 
 - 访问prometheus的web界面：`http://$NodeIP:39000`
--
-访问alertmanager的web界面：`http://$NodeIP:39001`
--
-访问grafana的web界面：`http://$NodeIP:39002` (默认用户密码 admin:admin，可在web界面修改)
+- 访问alertmanager的web界面：`http://$NodeIP:39001`
+- 访问grafana的web界面：`http://$NodeIP:39002` (默认用户密码 admin:admin，可在web界面修改)
 
 ## 管理操作
--
-升级（修改配置）：修改配置请在`prom-settings.yaml` `prom-alertsmanager.yaml` 等文件中进行，保存后执行：
+- 升级（修改配置）：修改配置请在`prom-settings.yaml` `prom-alertsmanager.yaml` 等文件中进行，保存后执行：
 
-```{.python .input}
+```bash
 # 修改prometheus
 $ helm upgrade --tls monitor -f prom-settings.yaml -f prom-alertsmanager.yaml -f prom-alertrules.yaml prometheus
 # 修改grafana

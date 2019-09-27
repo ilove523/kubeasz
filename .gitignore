@@ -23,3 +23,10 @@ roles/cluster-backup/files/*
 
 # cluster backups
 .cluster/
+
+# kube-ovn
+kube-ovn/*
+
+docs/guide/.ipynb*
+docs/*/.ipynb*
+docs/kube-own.wiki/*
