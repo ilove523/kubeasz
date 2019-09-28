@@ -107,13 +107,17 @@ admin用户web登陆后可以方便的创建项目，并指定项目属性(公�
 之后，即可使用docker push 上传
 
 ```bash
-docker login harbor.test.com
+# 登录
+docker login harbor.k8s.wfh.net
 ```
 ```ini
 Username:
 Password:
 Login Succeeded
-docker tag busybox:latest harbor.test.com/library/busybox:latest
+```
+```bash
+# 上传镜像
+docker tag busybox:latest harbor.k8s.wfh.net/library/busybox:latest
 docker push harbor.test.com/library/busybox:latest
 The push refers to a repository [harbor.test.com/library/busybox]
 0271b8eebde3: Pushed

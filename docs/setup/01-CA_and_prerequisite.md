@@ -2,19 +2,17 @@
 
 本步骤[01.prepare.yml](../../01.prepare.yml)主要完成:
 
-- [chrony
-role](../guide/chrony.md): 集群节点时间同步[可选]
-- deploy role: 创建CA证书、kubeconfig、kube-
-proxy.kubeconfig
+- [chrony role](../guide/chrony.md): 集群节点时间同步[可选]
+- deploy role: 创建CA证书、kubeconfig、kube-proxy.kubeconfig
 - prepare role: 分发CA证书、kubectl客户端安装、环境配置
 
 ## deploy 角色
 请在另外窗口打开[roles/deploy/tasks/main.yml](../../roles/deploy/tasks/main.yml)
 文件，对照看以下讲解内容。
 
-### 创建 CA 证书和
+### 创建 CA 证书
 
-```{.python .input}
+```shell
 roles/deploy/
 ├── defaults
 │   └── main.yml		# 配置文件：证书有效期，kubeconfig 相关配置
@@ -53,7 +51,7 @@ apiserver服务的`server cert`，也需要`client cert`连接`etcd`集群，这
 #### 创建 CA 配置文件
 [ca-config.json.j2](../../roles/deploy/templates/ca-config.json.j2)
 
-```{.python .input}
+```json
 {
   "signing": {
     "default": {
@@ -73,18 +71,16 @@ apiserver服务的`server cert`，也需要`client cert`连接`etcd`集群，这
   }
 }
 ```
-
-+ `signing`：表示该证书可用于签名其它证书；生成的 ca.pem 证书中 `CA=TRUE`；
-+ `server auth`：表示可以用该 CA 对
-server 提供的证书进行验证；
-+ `client auth`：表示可以用该 CA 对 client 提供的证书进行验证；
-+ `profile
-kubernetes` 包含了`server auth`和`client auth`，所以可以签发三种不同类型证书；
+> 特别说明： 证书根据用途不同分两类，一类是证书服务(server)，用于证书签发、证书管理、证书验证等；另一类是证书验证代理（client)，专门用于对一般用途的证书进行验证。
+> + `signing`：表示该证书可用于签名其它证书；生成的 ca.pem 证书中 `CA=TRUE`；
+> + `server auth`：表示可以用该 CA 对 server 提供的证书进行验证；
+> + `client auth`：表示可以用该 CA 对 client 提供的证书进行验证；
+> + `profile kubernetes` 包含了`server auth`和`client auth`，所以可以签发三种不同类型证书。
 
 #### 创建 CA 证书签名请求
 [ca-csr.json.j2](../../roles/deploy/templates/ca-csr.json.j2)
 
-```{.python .input}
+```json
 {
   "CN": "kubernetes",
   "key": {
@@ -105,6 +101,49 @@ kubernetes` 包含了`server auth`和`client auth`，所以可以签发三种不
   }
 }
 ```
+> 特别提示： 这里需要对证书配置文件里的字段做一个补充说明：
+> 1. 证书基本信息：
+>     + "C" - 表示国家编码（2位字母缩写，中国是 `CN`)
+>     + "ST" - 表示州或省市（须填写全名，首字母大写，如：北京市-Beijing）
+>     + "L" - 表示行政区（如：海淀区 - Beijing)
+>     + "O" - 表示组织名 (如：公司名或者机构名)
+>     + "OU" - 表示某组织的某部门名或团队名
+>     + "CN" - 表示通用名（如：域名 - example.com 或 *.example.com)，方便在证书验证的时候快速获取
+> 2. 证书用到的算法：
+>     + "algo" - 使用到的加密算法，这里是`rsa`
+>     + "size" - 加密算法长度，这里是`2048`
+> 3. 证书有效期：
+>     + "expiry" - 证书有效时长，可以用小时计，也可以用天
+
+***建议：*** 根据自己组织或公司情况修改相应字段，我这里提供快速修改的方法，仅供参考：
+
+config_ca.sh
+```bash
+#!/bin/bash
+# 这里在各自变量前增加一个证书前缀'CA_'，方便识别和维护
+CA_C=CN
+CA_ST=Beijing
+CA_L=Beijing
+CA_O=k8s
+CA_OU=System
+#CA_CN=kubernetes
+CA_CN=
+# 24*365=8760h 表示平年的1年，我们先搞个10年，上面的示例是100年
+CA_expiry="{{ CA_EXPIRY }}"
+CA_SETS=('C' 'ST' 'L' 'O' 'OU' 'CN' 'expiry')
+csr_file_arr=(`find /etc/ansible/roles -name "*csr.json.j2" -type f`)
+for CA_KEY in ${CA_SETS[*]}; do
+  sed -n '/"'$CA_KEY'":/p' ${csr_file_arr[@]}
+  read -p "确定修改(no)？[y|n]: " ok
+  test "$ok" = 'n' -o -z "$ok" && continue
+  eval CA_KEY_VALUE=\$CA_${CA_KEY}
+  read -p "修改 $CA_KEY ?$CA_KEY_VALUE(同意直接回车，否则，输入后回车)" new_val
+  test -n "$new_val" && CA_KEY_VALUE="$new_val"
+  #find /etc/ansible -name "*csr.json*" -type f -exec grep -n -w "${CA_KEY}" {} \;
+  sed -i 's|\("'${CA_KEY}'":\).*|\1 "'${CA_KEY_VALUE}'",|' ${csr_file_arr[@]}
+done
+```
+> 在实际生产中，一定要注意证书的有效期，视具体情况而定，保证安全或利益嘛!
 
 #### 生成CA 证书和私钥
 
@@ -157,7 +196,7 @@ Role:
 Subjects:
   Kind   Name            Namespace
   ----   ----            ---------
-  Group  system:masters  
+  Group  system:masters
 ```
 
 #### 生成 admin 用户证书
@@ -218,7 +257,7 @@ Role:
 Subjects:
   Kind  Name               Namespace
   ----  ----               ---------
-  User  system:kube-proxy  
+  User  system:kube-proxy
 ```
 
 #### 生成 system:kube-proxy 用户证书
