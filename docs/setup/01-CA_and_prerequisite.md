@@ -147,19 +147,15 @@ done
 
 #### 生成CA 证书和私钥
 
-```{.python .input}
+```bash
 cfssl gencert -initca ca-csr.json | cfssljson -bare ca
 ```
 
 ### 生成 kubeconfig 配置文件
 
-kubectl使用~/.kube/config 配置文件与kube-apiserver进行交互，且拥有管理
-K8S集群的完全权限，
+kubectl使用~/.kube/config 配置文件与kube-apiserver进行交互，且拥有管理K8S集群的完全权限，准备kubectl使用的admin 证书签名请求 [admin-csr.json.j2](../../roles/deploy/templates/admin-csr.json.j2)
 
-准备kubectl使用的admin 证书签名请求 [admin-
-csr.json.j2](../../roles/deploy/templates/admin-csr.json.j2)
-
-```{.python .input}
+```json
 {
   "CN": "admin",
   "hosts": [],
@@ -185,8 +181,12 @@ csr.json.j2](../../roles/deploy/templates/admin-csr.json.j2)
 `RBAC` 预定义的 `ClusterRoleBinding` 将 Group `system:masters` 与 ClusterRole
 `cluster-admin` 绑定，这就赋予了kubectl**所有集群权限**
 
-```{.python .input}
+查看集群角色指令：
+```bash
 $ kubectl describe clusterrolebinding cluster-admin
+```
+输出结果：
+```ini
 Name:         cluster-admin
 Labels:       kubernetes.io/bootstrapping=rbac-defaults
 Annotations:  rbac.authorization.kubernetes.io/autoupdate=true
@@ -201,7 +201,7 @@ Subjects:
 
 #### 生成 admin 用户证书
 
-```{.python .input}
+```bash
 cfssl gencert -ca=ca.pem -ca-key=ca-key.pem -config=ca-config.json -profile=kubernetes admin-csr.json | cfssljson -bare admin
 ```
 
@@ -210,7 +210,7 @@ cfssl gencert -ca=ca.pem -ca-key=ca-key.pem -config=ca-config.json -profile=kube
 使用`kubectl config` 生成kubeconfig 自动保存到
 ~/.kube/config，生成后 `cat ~/.kube/config`可以验证配置文件包含 kube-apiserver 地址、证书、用户名等信息。
 
-```{.python .input}
+```bash
 kubectl config set-cluster kubernetes --certificate-authority=ca.pem --embed-certs=true --server=127.0.0.1:8443
 kubectl config set-credentials admin --client-certificate=admin.pem --embed-certs=true --client-key=admin-key.pem
 kubectl config set-context kubernetes --cluster=kubernetes --user=admin
@@ -221,7 +221,7 @@ kubectl config use-context kubernetes
 
 创建 kube-proxy 证书请求
 
-```{.python .input}
+```json
 {
   "CN": "system:kube-proxy",
   "hosts": [],
@@ -246,8 +246,11 @@ kubectl config use-context kubernetes
 ClusterRoleBinding system:node-proxier 将User system:kube-proxy 与 Role
 system:node-proxier 绑定，授予了调用 kube-apiserver Proxy 相关 API 的权限；
 
-```{.python .input}
-$ kubectl describe clusterrolebinding system:node-proxier
+```bash
+kubectl describe clusterrolebinding system:node-proxier
+```
+输出结果：
+```ini
 Name:         system:node-proxier
 Labels:       kubernetes.io/bootstrapping=rbac-defaults
 Annotations:  rbac.authorization.kubernetes.io/autoupdate=true
@@ -262,16 +265,15 @@ Subjects:
 
 #### 生成 system:kube-proxy 用户证书
 
-```{.python .input}
+```bash
 cfssl gencert -ca=ca.pem -ca-key=ca-key.pem -config=ca-config.json -profile=kubernetes kube-proxy-csr.json | cfssljson -bare kube-proxy
 ```
 
 #### 生成 kube-proxy.kubeconfig
 
-使用`kubectl config` 生成kubeconfig 自动保存到 kube-
-proxy.kubeconfig
+使用`kubectl config` 生成kubeconfig 自动保存到 kube-proxy.kubeconfig
 
-```{.python .input}
+```bash
 kubectl config set-cluster kubernetes --certificate-authority=ca.pem --embed-certs=true --server=127.0.0.1:8443 --kubeconfig=kube-proxy.kubeconfig
 kubectl config set-credentials kube-proxy --client-certificate=kube-proxy.pem --embed-certs=true --client-key=kube-proxy-key.pem --kubeconfig=kube-proxy.kubeconfig
 kubectl config set-context default --cluster=kubernetes --user=kube-proxy --kubeconfig=kube-proxy.kubeconfig
@@ -283,8 +285,9 @@ kubectl config use-context default --kubeconfig=kube-proxy.kubeconfig
 文件，比较简单直观
 
 1. 首先设置基础操作系统软件和系统参数，请阅读脚本中的注释内容
-1. 首先创建一些基础文件目录
-1. 把证书工具 CFSSL
+2. 首先创建一些基础文件目录
+3. 把证书工具 CFSSL
 下发到指定节点，并下发kubeconfig配置文件
-1. 把CA 证书相关下发到指定节点的 {{ ca_dir }} 目录
+4. 把CA 证书相关下发到指定节点的 {{ ca_dir }} 目录
+
 [后一篇](02-install_etcd.md)
